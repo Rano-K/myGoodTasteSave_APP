@@ -37,6 +37,7 @@ class _InsertPlaceState extends State<InsertPlace> {
   XFile? imageFile;
   final ImagePicker picker = ImagePicker();
   late DateTime actionDate;
+  late double rating;
 
   @override
   void initState() {
@@ -49,7 +50,8 @@ class _InsertPlaceState extends State<InsertPlace> {
     kindChoice = 0;
     checkLocationPermission();
     actionDate = DateTime.now();
-    print(actionDate);
+      print(actionDate);
+    rating = 3;
   }
 
   @override
@@ -155,8 +157,6 @@ class _InsertPlaceState extends State<InsertPlace> {
                     ),
                   ),
                   RatingBar.builder(
-            
-                    
                     initialRating: 3,
                     minRating: 1,
                     direction: Axis.horizontal,
@@ -170,6 +170,7 @@ class _InsertPlaceState extends State<InsertPlace> {
                     onRatingUpdate: (rating) {
                       // ignore: avoid_print
                       print(rating);
+                      
                     },
                   ),
                 ],
@@ -230,6 +231,7 @@ class _InsertPlaceState extends State<InsertPlace> {
       lng: lng,
       image1: getImage,
       actiondate: actionDate,
+      rating: rating,
     );
 
 

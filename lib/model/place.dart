@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 
+
 class Place{
   final int? id; //autoincrement
   final String name;
@@ -9,6 +10,7 @@ class Place{
   final double lng;
   final Uint8List image1;
   final DateTime? actiondate;
+  final double rating;
 
   Place(
     {
@@ -19,6 +21,7 @@ class Place{
       required this.lng,
       required this.image1,
       required this.actiondate,
+      required this.rating,
     
       
     }
@@ -40,7 +43,8 @@ class Place{
       lat=res['lat'],
       lng=res['lng'],
       image1=res['image1'],
-      actiondate=DateTime.parse(res['actiondate']);
+      actiondate=DateTime.parse(res['actiondate']),
+      rating = res['rating'];
 
 
 }

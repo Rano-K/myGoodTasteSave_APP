@@ -1,7 +1,6 @@
-// ignore_for_file: avoid_print, camel_case_types
+// ignore_for_file: avoid_print, camel_case_types, duplicate_ignore, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:my_favorite_goodtaste_list_app/view/home.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,7 +17,7 @@ class _Permission_ViewState extends State<Permission_View> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    allPermission();
+    checkAndRequestPermissions();
   }
 
   @override
@@ -48,8 +47,8 @@ class _Permission_ViewState extends State<Permission_View> {
             //Divider
             Container(
                 width: 300,
-                child: Divider(
-                    color: const Color.fromARGB(255, 253, 94, 35),
+                child: const Divider(
+                    color: Color.fromARGB(255, 253, 94, 35),
                     thickness: 2.0)),
 
             //camera권한블럭>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -85,7 +84,7 @@ class _Permission_ViewState extends State<Permission_View> {
               ),
             ),
             //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<camera권한블럭 끝
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             //gallery권한블럭 시작>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -121,7 +120,7 @@ class _Permission_ViewState extends State<Permission_View> {
               ),
             ),
             //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Gallery권한블럭 끝
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             //위치권한블럭 시작>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -158,7 +157,7 @@ class _Permission_ViewState extends State<Permission_View> {
             ),
             //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Gallery권한블럭 끝
             IconButton.filled(
-                onPressed: allPermission, icon: const Icon(Icons.check))
+                onPressed: checkAndRequestPermissions, icon: const Icon(Icons.check))
           ],
         ),
       ),
@@ -173,64 +172,75 @@ class _Permission_ViewState extends State<Permission_View> {
     3. 위치 권한(Geolocator 사용)
   */
   /// 모든 권한 체크후 다음으로 넘어갈 것.
-  allPermission() async {
-    var statusCamera = await Permission.camera.status; //카메라 권한 체크
-    var statusPhoto = await Permission.photos.status; //앨범 권한 체크
-    var statusLocation = await Geolocator.checkPermission();
+  
+    // var statusCamera = await Permission.camera.status; //카메라 권한 체크
+    // var statusPhoto = await Permission.photos.status; //앨범 권한 체크
+    // var statusLocation = await Permission.location.status; // location권한체크
 
-    // 모든 권한이 허용되었는지 확인
-    if (statusCamera.isGranted &&
-        statusPhoto.isGranted &&
-        (statusLocation == LocationPermission.whileInUse ||
-            statusLocation == LocationPermission.always)) {
-      // 모든 권한이 허용된 경우 Home으로 이동
-      Get.off(const Home());
+    // // 모든 권한이 허용되었는지 확인
+    // if (statusCamera.isGranted &&
+    //     statusPhoto.isGranted &&
+    //     statusLocation.isGranted) {
+    //   // 모든 권한이 허용된 경우 Home으로 이동
+    //   Get.off(() => const Home());
+    //   }else {
+    //     // 권한 중 하나라도 거부된 경우, 각 권한 요청
+    //     if (!statusCamera.isGranted) {
+    //       await Permission.camera.request();
+    //     }
+    //     if (!statusPhoto.isGranted) {
+    //       await Permission.photos.request();
+    //       if(!statusPhoto.isRestricted){
+    //         errorDialog();
+    //       }
+    //     }
+    //     if (!statusLocation.isGranted) {
+    //       await Permission.location.request();
+    //     }
+    //   // 모든 권한을 다시 확인 후 여전히 거부된 권한이 있다면 에러 대화상자 표시
+    //   if (!statusCamera.isGranted ||
+    //       !statusPhoto.isGranted ||
+    //       !statusLocation.isGranted) {
+    //     errorDialog();
+    //   }
+    // }
+    Future<void> checkAndRequestPermissions() async {
+    final allStatus = await [
+      Permission.camera,
+      Permission.photos,
+      Permission.location,
+    ].request();
+
+    if (allStatus.values.every((status) => status.isGranted)) {
+      Get.off(() => const Home());
     } else {
-      // 권한 중 하나라도 거부된 경우, 각 권한 요청
-      if (!statusCamera.isGranted) {
-        await Permission.camera.request();
-      }
-      if (!statusPhoto.isGranted) {
-        await Permission.photos.request();
-      }
-      if (statusLocation == LocationPermission.denied ||
-          statusLocation == LocationPermission.deniedForever) {
-        await Geolocator.requestPermission();
-      }
-      // 모든 권한을 다시 확인 후 여전히 거부된 권한이 있다면 에러 대화상자 표시
-      if (!statusCamera.isGranted ||
-          !statusPhoto.isGranted ||
-          (statusLocation != LocationPermission.whileInUse &&
-              statusLocation != LocationPermission.always)) {
-        errorDialog();
-      }
-    }
-  }
-
-  /// 3. 사용자의 위치를 허용하시겠습니까?
-  checkLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        print('사용자가 위치 권한을 거부했습니다');
-        errorDialog();
-      } else {
-        print('위치 권한이 부여되었습니다.');
-        Get.to(const Home());
-      }
-    } else if (permission == LocationPermission.deniedForever) {
-      print('위치 권한이 영구적으로 거부되어있습니다');
       errorDialog();
-    } else {
-      print('위치 권한이 이미 부여되었거나, 사용자가 권한 요청을 수락했습니다. 위치 관련 작업을 계속할 수 있습니다.');
-      setState(() {
-        const Home();
-      });
     }
   }
+  }
+
+  // /// 3. 사용자의 위치를 허용하시겠습니까?
+  // checkLocationPermission() async {
+  //   LocationPermission permission = await Geolocator.checkPermission();
+    
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied ||
+  //         permission == LocationPermission.deniedForever) {
+  //       print('사용자가 위치 권한을 거부했습니다');
+  //       errorDialog();
+  //     } else {
+  //       print('위치 권한이 부여되었습니다.');
+  //       Get.off(() => const Home());
+  //     }
+  //   } else if (permission == LocationPermission.deniedForever) {
+  //     print('위치 권한이 영구적으로 거부되어있습니다');
+  //     errorDialog();
+  //   } else {
+  //     print('위치 권한이 이미 부여되었거나, 사용자가 권한 요청을 수락했습니다. 위치 관련 작업을 계속할 수 있습니다.');
+  //     Get.off(() => const Home());
+  //   }
+  // }
 
   /// 앱사용불가 팝업알림
   /// OK 버튼 => appSettings로 넘어가게
@@ -277,7 +287,7 @@ class _Permission_ViewState extends State<Permission_View> {
   //     print(e);
   //   });
   // }
-}
+
 
 
 

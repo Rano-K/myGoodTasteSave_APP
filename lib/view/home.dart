@@ -133,8 +133,13 @@ class _HomeState extends State<Home> {
                                                 overflow: TextOverflow.ellipsis,
                                                 ),
                                             Text(
+                                                "별점:${snapshot.data![index].rating}",
+                                                overflow: TextOverflow.fade,
+                                              ),
+                                            Text(
                                                 "평가: ${snapshot.data![index].estimate}",
-                                                overflow: TextOverflow.ellipsis,
+                                                overflow: TextOverflow.fade,
+                                                maxLines: 2,
                                                 ),
                                           ],
                                         ),

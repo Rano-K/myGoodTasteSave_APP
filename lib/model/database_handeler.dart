@@ -9,7 +9,7 @@ class DatabaseHandler{
       join(path, 'goodtastelist.db'),//위치잡아주는게 path
       onCreate: (database, version) async { //app실행시 db없을 때 만들어 준다. 만들어져있으면 oncreate안함.
         await database.execute(
-          "create table goodtastelist(id integer primary key autoincrement, name text not null, estimate text, lat real, lng real, image1 blob, actiondate text)"
+          "create table goodtastelist(id integer primary key autoincrement, name text not null, estimate text, lat real, lng real, image1 blob, actiondate text, rating integer)"
         ) ;
       } ,
       version: 1
@@ -21,7 +21,7 @@ class DatabaseHandler{
   insertPlace(Place place)async{
     final Database db = await initializeDB();
     await db.rawInsert(
-      "insert into goodtastelist(name, estimate, lat, lng, image1, actiondate ) values (?,?,?,?,?,datetime('now', 'localtime'))",
+      "insert into goodtastelist(name, estimate, lat, lng, image1, actiondate, rating ) values (?,?,?,?,?,datetime('now', 'localtime'),?)",
       [
         place.name,
         place.estimate,
@@ -44,14 +44,15 @@ class DatabaseHandler{
   Future updatePlace(Place place) async{
     final Database db = await initializeDB();
     await db.rawUpdate(
-      'update goodtastelist set name=?, estimate=?, lat=?, lng=?, image1=?, actiondate = datetime("now", "localtime") where id=?',
+      'update goodtastelist set name=?, estimate=?, lat=?, lng=?, image1=?, actiondate = datetime("now", "localtime") where id=?, rating =?',
       [
         place.name,
         place.estimate,
         place.lat,
         place.lng,
         place.image1,
-        place.id
+        place.id,
+        place.rating,
       ]
     );
   }
